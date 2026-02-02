@@ -44,7 +44,7 @@ export async function POST(req) {
   const { data } = await b2.uploadFile({
     uploadUrl: uploadUrl.uploadUrl,              // URL temporária de upload
     uploadAuthToken: uploadUrl.authorizationToken, // Token de autorização
-    fileName: `photos/${Date.now()}-${file.name}`, // Caminho + nome do arquivo
+    fileName: `privado/${Date.now()}-${file.name}`, // Caminho + nome do arquivo
     data: buffer,                                // Conteúdo do arquivo
     contentType: file.type,                      // Tipo MIME (image/jpeg, etc)
   });

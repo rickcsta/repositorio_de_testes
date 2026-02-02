@@ -18,7 +18,7 @@ export async function GET() {
     // Lista os arquivos do bucket
     const { data } = await b2.listFileNames({
       bucketId: process.env.B2_BUCKET_ID, // ID do bucket
-      prefix: "photos/",                  // Lista apenas arquivos dentro da pasta "photos/"
+      prefix: "privado/",                  // Lista apenas arquivos dentro da pasta "photos/"
       maxFileCount: 100,                  // Limite de arquivos retornados
     });
 
