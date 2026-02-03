@@ -3,49 +3,52 @@
 import { useEffect, useState } from "react";
 
 export default function Home() {
-
-  const [files, setFiles] = useState([]);
+  const [filesPrivado, setFilesPrivado] = useState([]);
+  const [filesPublico, setFilesPublico] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  //listar arquivos
+  // listar arquivos das duas pastas
   async function loadFiles() {
     const res = await fetch("/api/files");
     const data = await res.json();
-    setFiles(data);
+
+    // separa os arrays recebidos do backend
+    setFilesPrivado(data.privado || []);
+    setFilesPublico(data.publico || []);
   }
 
   useEffect(() => {
     loadFiles();
   }, []);
 
-  //funcao upload
-      async function upload() {
-        if (!selectedFiles.length) return;
+  // upload múltiplo
+  async function upload() {
+    if (!selectedFiles.length) return;
 
-        setLoading(true);
+    setLoading(true);
 
-        for (const file of selectedFiles) {
-          const formData = new FormData();
-          formData.append("file", file);
+    for (const file of selectedFiles) {
+      const formData = new FormData();
+      formData.append("file", file);
 
-          await fetch("/api/upload", {
-            method: "POST",
-            body: formData,
-          });
-        }
+      await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+    }
 
-        setLoading(false);
-        setSelectedFiles([]);
-        loadFiles();
-      }
+    setLoading(false);
+    setSelectedFiles([]);
+    loadFiles();
+  }
 
-  //download
+  // download
   function download(fileName) {
     window.open(`/api/download?file=${encodeURIComponent(fileName)}`);
   }
 
-  //funcao delete
+  // delete
   async function remove(file) {
     await fetch("/api/delete", {
       method: "DELETE",
@@ -64,8 +67,7 @@ export default function Home() {
 
       <hr />
 
-{/* fazendo upload */}
-
+      {/* UPLOAD */}
       <h3>Upload</h3>
       <input
         type="file"
@@ -75,21 +77,42 @@ export default function Home() {
       <button onClick={upload} disabled={loading || selectedFiles.length === 0}>
         Enviar arquivos
       </button>
-
       {loading && <p>Enviando...</p>}
 
       <hr />
 
-{/* fazendo listagem*/}
-
-      <h3>Arquivos</h3>
-
-      {files.length === 0 && <p>Nenhum arquivo encontrado.</p>}
-
-{/*fazendo download e delete*/}
-
+      {/* LISTA DE ARQUIVOS PRIVADOS */}
+      <h3>Arquivos Privados</h3>
+      {filesPrivado.length === 0 && <p>Nenhum arquivo privado.</p>}
       <ul>
-        {files.map(file => (
+        {filesPrivado.map(file => (
+          <li key={file.fileId} style={{ marginBottom: 10 }}>
+            {file.fileName.split("/").pop()}
+
+            <button
+              style={{ marginLeft: 10 }}
+              onClick={() => download(file.fileName)}
+            >
+              Download
+            </button>
+
+            <button
+              style={{ marginLeft: 5 }}
+              onClick={() => remove(file)}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <hr />
+
+      {/* LISTA DE ARQUIVOS PÚBLICOS */}
+      <h3>Arquivos Públicos</h3>
+      {filesPublico.length === 0 && <p>Nenhum arquivo público.</p>}
+      <ul>
+        {filesPublico.map(file => (
           <li key={file.fileId} style={{ marginBottom: 10 }}>
             {file.fileName.split("/").pop()}
 
